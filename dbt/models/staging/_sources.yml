@@ -1,0 +1,55 @@
+version: 2
+
+sources:
+  - name: raw_data
+    description: Raw data from operational systems
+    database: august-button-470114-h8
+    schema: raw_data
+    
+    tables:
+      - name: sales_transactions
+        description: Individual product sales transactions
+        columns:
+          - name: transaction_id
+            description: Unique transaction identifier
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Customer identifier
+            tests:
+              - not_null
+          - name: transaction_timestamp
+            description: When the transaction occurred
+            tests:
+              - not_null
+
+      - name: customers
+        description: Customer master data
+        columns:
+          - name: customer_id
+            description: Unique customer identifier
+            tests:
+              - unique
+              - not_null
+
+      - name: products
+        description: Product catalog
+        columns:
+          - name: product_id
+            description: Unique product identifier
+            tests:
+              - unique
+              - not_null
+
+      - name: inventory_levels
+        description: Current inventory by store and product
+        
+      - name: supply_orders
+        description: Purchase orders from suppliers
+        
+      - name: web_events
+        description: Website user interaction events
+        
+      - name: marketing_campaigns
+        description: Marketing campaign metadata

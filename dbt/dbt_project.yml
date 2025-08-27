@@ -1,0 +1,83 @@
+# dbt_project.yml - Main dbt project configuration
+name: 'freshmarket'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'freshmarket'
+
+# These configurations specify where dbt should look for different types of files.
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  freshmarket:
+    # Default materialization for all models
+    +materialized: view
+    
+    # Staging models - lightweight views for initial cleaning
+    staging:
+      +materialized: view
+      +schema: staging
+    
+    # Warehouse models - core business logic, dimensions and facts
+    warehouse:
+      +materialized: table
+      +schema: warehouse
+      # Dimension tables
+      dimensions:
+        +materialized: table
+      # Fact tables  
+      facts:
+        +materialized: table
+        # Remove partition config for now - add back per model as needed
+        # +partition_by:
+        #   field: transaction_date
+        #   data_type: date
+    
+    # Data marts - business-specific analytical views
+    marts:
+      +materialized: table
+      +schema: marts
+      # Individual mart configurations
+      customer:
+        +materialized: table
+      inventory:
+        +materialized: table
+      marketing:
+        +materialized: table
+      sales:
+        +materialized: table
+
+# Test configurations
+tests:
+  +store_failures: true
+  +schema: test_results
+
+# Variables
+vars:
+  # Date variables for incremental loads
+  start_date: '2024-01-01'
+  end_date: '{{ run_started_at.strftime("%Y-%m-%d") }}'
+  
+  # Business logic variables
+  high_value_customer_threshold: 10000  # THB
+  reorder_buffer_days: 7
+  seasonal_categories: ['Fresh Produce', 'Beverages']
+
+# Snapshot configurations
+snapshots:
+  freshmarket:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at

@@ -1,0 +1,23 @@
+# profiles.yml - Database connection configuration
+freshmarket:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: august-button-470114-h8
+      dataset: dbt_dev  # This will be your default schema
+      threads: 4
+      timeout_seconds: 300
+      location: asia-southeast1  # Change to your BigQuery location if different
+      keyfile: /home/sarach_srik/dbt-service-account-key.json  # Update this path
+      
+    prod:
+      type: bigquery
+      method: service-account
+      project: august-button-470114-h8
+      dataset: dbt_prod
+      threads: 4
+      timeout_seconds: 300
+      location: asia-southeast1
+      keyfile: /home/sarach_srik/dbt-service-account-key.json  # Update this path

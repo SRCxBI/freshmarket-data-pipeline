@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension with SCD Type 2"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - is_current
+    columns:
+      - name: customer_key
+        description: "Surrogate key for customer"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Natural key for customer"
+        tests:
+          - not_null
+      - name: is_current
+        description: "Flag for current record"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  - name: dim_products
+    description: "Product dimension"
+    columns:
+      - name: product_key
+        description: "Surrogate key for product"
+        tests:
+          - unique
+          - not_null
+      - name: product_id
+        description: "Natural key for product"
+        tests:
+          - unique
+          - not_null
+      - name: selling_price
+        description: "Current selling price"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: unit_cost
+        description: "Unit cost"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+
+  - name: fct_sales
+    description: "Sales fact table"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "net_revenue >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "quantity > 0"
+    columns:
+      - name: sales_key
+        description: "Surrogate key for sales fact"
+        tests:
+          - unique
+          - not_null
+      - name: transaction_id
+        description: "Natural key for transaction"
+        tests:
+          - not_null
+      - name: transaction_date
+        description: "Date of transaction"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: "'2023-01-01'"
+              max_value: "current_date()"
+      - name: quantity
+        description: "Quantity sold"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: unit_price
+        description: "Unit price"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: total_amount
+        description: "Total transaction amount"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
